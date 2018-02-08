@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+ 
+<html lang="en">
+
+	<head>
+		<title>TODO</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<link rel="stylesheet" href="css/todo.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	</head>
+	
+	<body onresize="initial_layout()">
+		
+		<header class="header">TODO</header>
+		
+		<nav class="menu">
+			<label>Change language</label><br>
+			<img class="link-button" onclick="load_doc(languages.english)" src="img/en.png" />
+			<img class="link-button" onclick="load_doc(languages.bulgarian)" src="img/bg.png" />
+			<label>Export/Import WebDB</label><br>
+			<img class="link-button" onclick="window.alert(error_messages[4])" src="img/db.png" />			
+		</nav>
+		
+		<main class="main"> 
+			<section class="note form" >
+				<form name="add" method="post">		
+					<input class="input note_header" type="text" name="note_header" placeholder="Title...">
+					<textarea rows="1" cols="30" class="input textarea" name="note_text" placeholder="Take a note..."></textarea>
+					<input type="button" class="button button2" value="Done" onclick="validate_add_note_from()">	
+					<input type="color" name="pick_color" class="picker" value="#ffffff" onchange="change_form_color()">	
+				</form>
+			</section>
+			
+			<article class="container">						
+			</article>
+		</main>
+				
+		<footer class="footer">unazko</footer>
+		<script src="js/todo.js"></script> 
+	</body>
+</html>
