@@ -2,7 +2,7 @@
 	"title":"TODO",
 	"header":"TODO",
 	"label_one":"Change language",
-	"label_two":"Import/Export WebDB",
+	"label_two":"Import/Export localDB",
 	"input_title": "Title...",
 	"input_note_text": "Take a note...",
 	"done_button": "Done",

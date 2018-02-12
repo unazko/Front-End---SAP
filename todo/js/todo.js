@@ -1,4 +1,82 @@
-"use strict";
+	/**
+	*	TODO:
+	*	1)	 Drag and drop functionality for the notes
+	*	2)	 Use browser localdb to store all information about the notes and language (authorization not required)
+	*	3)	 Export localdb to file so it can be imported in other browsers
+	**/
+	"use strict";	
+	
+	/**
+	*	Main thing I have to do is to copy all the created notes properties in order to recreate them
+	*	next time i load the page with the help of add_item() and initial_layout() functions.
+	*	I don't have to calculate placement of the notes because the initial_layout() knows how to place them.
+	* 	
+	*	0)Note properties I need:
+	*		0.1)Color
+	*		0.2)Title
+	*		0.3)Text
+	*		0.4)Scratch
+	*		0.5)Other properties are by default in creation
+	*	1)When I save information in the local storage I need:
+	*		1.1) Completed notes with all of their properties
+	*		1.2) Language settings
+	*	2)I don't need to:
+	*		2.1) Validate the notes
+	**/
+		
+	/**
+	*	The process should be something like this:
+	*	In add_item() function I save the note properties from point 0) into the Web Storage
+	*	Also when I am removing a note I need to remove those properties from Web Storage
+	*	I have to think of some sort of container to hold the note properties (something like id for each note)
+	*	Problem comes when editing note styles - i have even to get clicked note but what about id
+	*	user can click on each note and edit it and i need to know what is that note id in order to save editions in the web storage
+	* 	!!The idea is to add the unique id to each note as an attribute and then get this note on click therefore know the id
+	*	Then I will create a function which will be called once when the site is loaded to recreate all the notes
+	*	from the web Storage
+	**/	
+	
+	/**
+	*	How the recreating function can take notes properties for each note at a time
+	*	and call add_item() with those properties
+	*	One thing that comes in mind is to save those properties in one object like stringified jason
+	*	and then execute JASON.parse(jason_string)
+	*	So it will look like this "0" : "{ 'dasda': 'dsada', 'dsada': 'dasdas' }"
+	*	In fact localStorage is kind of like an associative array
+	*	and I will need some sort of indexes so i can make function to generate id (closure) so
+	*	the id counter stays private and capsulated
+	**/
+	
+	/** function to remove all Web Storage Data **/
+	function test() {
+		for(let i = 1; i <= 50; ++i) {
+			localStorage.removeItem(i);
+		}
+	}	
+	//test();
+
+	/** I need global counter so i know from what value to start generating id **/
+	var stored_notes = 0;
+	
+	if (typeof(Storage) !== "undefined") {
+		stored_notes = localStorage.length;
+	} else {
+		window.alert("Your browser does not support web storage and notes cannot be saved!");
+	}
+	
+	/** Function to generate unique id **/
+	var get_note_id = (function() {
+		var counter = stored_notes;
+		return function() { return ++counter; }
+	})();
+	
+	
+	/** Function to generate note properties string **/
+	function get_note_string(color_value, title_value, text_area_value, scratch_value) {
+
+		var note_object = { color: color_value, title: title_value, text_area: text_area_value, scratch: scratch_value };		
+		return JSON.stringify(note_object);
+	}	
 	
 	const languages = { bulgarian: "data/bulgarian.json", english: "data/english.json"};
 	
@@ -13,8 +91,7 @@
 				var lang_obj = JSON.parse(jason);
 				change_language(lang_obj, doc_name);
 			}
-		};
-		
+		};		
 		xhttp.open("GET", doc_name, true);
 		xhttp.send();
 	}
@@ -141,17 +218,15 @@
 	}
 	
 	function hide_details(note) {
-	
-		//for(let i = 3; i < note.childNodes.length; ++i) {
-		//	note.childNodes[i].style.visibility = "hidden";
-		//}
+		/*for(let i = 3; i < note.childNodes.length; ++i) {
+			note.childNodes[i].style.visibility = "hidden";
+		}*/
 	}	
 	
 	function show_details(note) {
-		
-		//for(let i = 3; i < note.childNodes.length; ++i) {
-		//	note.childNodes[i].style.visibility = "visible";
-		//}
+		/*for(let i = 3; i < note.childNodes.length; ++i) {
+			note.childNodes[i].style.visibility = "visible";
+		}*/
 	}
 	
 	function change_note_color(picker) {
@@ -163,35 +238,89 @@
 			window.alert(error_messages[3]);
 		} else {
 			var note = picker.parentElement;
+			var note_id = note.getAttribute("id");
 			note.setAttribute("style", "background-color: " + color + ";");
+			
+			let note_header = note.childNodes[0];
+			let note_text = note.childNodes[1];
+			let note_scratch = note.childNodes[4];			
+			
+			let checkbox_value = (note_scratch.checked ? 1 : 0);		
+			let currnet_note_jason_string = get_note_string(color, note_header.innerHTML, note_text.innerHTML, checkbox_value);
+			
+			//Saving current note properties into web storage
+			if (typeof(Storage) !== "undefined") {
+				localStorage.setItem(note_id, currnet_note_jason_string);
+			} else {
+				window.alert("Your browser does not support web storage and notes cannot be saved!");
+			}
 		}
 	}
 	
-	function delete_note(delete_icon) {
+	///Here is the place to remove note id from the Web Storage and I am done BOBI
+	///When I am deleting a note I just place empty  string on the 
+	///note index and skip all empty values from local storage while recreating notes
+	function delete_note(delete_icon) {	
 		var note = delete_icon.parentElement;
+		var note_id = note.getAttribute("id");
 		var note_parent = note.parentElement;
 		note_parent.removeChild(note);
+		
+		if (typeof(Storage) !== "undefined") {
+			localStorage.setItem(note_id, "");
+			
+		} else {
+			window.alert("Your browser does not support web storage and notes cannot be saved!");
+		}
 	}
 	
 	function scratch_task(scratch_box) {
 		var note = scratch_box.parentElement;
-
-		if(scratch_box.checked) {
+		var note_id = note.getAttribute("id");
+		
+		let checkbox_value = (scratch_box.checked ? 1 : 0);
+		
+		if(checkbox_value) {
 			note.childNodes[1].setAttribute("style", "text-decoration: line-through");
 		} else {
 			note.childNodes[1].setAttribute("style", "text-decoration: none");
+		}
+		/*
+		0: header
+		1: textarea
+		2: done_button
+		3: picker
+		4: scratch
+		5: delete_icon
+		*/
+		///save to web db
+		let currnet_note_jason_string = get_note_string(note.childNodes[3].value, note.childNodes[0].innerHTML, note.childNodes[1].innerHTML, checkbox_value);
+		
+		if (typeof(Storage) !== "undefined") {
+			localStorage.setItem(note_id, currnet_note_jason_string);
+		} else {
+			window.alert("Your browser does not support web storage and notes cannot be saved!");
 		}
 	}
 	
 	function done_edition(done_button) {
 		
 		var note = done_button.parentElement;
+		var note_id = note.getAttribute("id");		
 		done_button.style.visibility = "hidden";
-		
+		/*
+		0: header
+		1: textarea
+		2: done_button
+		3: picker
+		4: scratch
+		5: delete_icon
+		*/
 		var header_text = note.childNodes[0].value;
+		var textarea_text = note.childNodes[1].value;
 		
 		if(typeof header_text !== "undefined") {
-			//input header
+			///input header
 			var new_header = document.createElement("div");		
 			var herder_text_node = document.createTextNode(header_text);
 			
@@ -200,12 +329,19 @@
 			new_header.setAttribute("style", "font-weight: 700");
 			new_header.setAttribute("onclick", "edit_title(this)");
 			note.replaceChild(new_header, note.childNodes[0]);
+			
+			let checkbox_value = (note.childNodes[4].checked ? 1 : 0);		
+			let currnet_note_jason_string = get_note_string(note.childNodes[3].value, note.childNodes[0].innerHTML, note.childNodes[1].innerHTML, checkbox_value);
+			
+			if (typeof(Storage) !== "undefined") {
+				localStorage.setItem(note_id, currnet_note_jason_string);
+			} else {
+				window.alert("Your browser does not support web storage and notes cannot be saved!");
+			}
 		}
 		
-		var textarea_text = note.childNodes[1].value;
-
 		if(typeof textarea_text !== "undefined") {
-			//input text		
+			///input text
 			var text_wrapper = document.createElement("div");		
 			var textarea_node = document.createTextNode(textarea_text);
 			
@@ -219,9 +355,18 @@
 			} else {
 				text_wrapper.setAttribute("style", "text-decoration: none;");
 			}
+			
+			///save to local db
+			let checkbox_value = (note.childNodes[4].checked ? 1 : 0);		
+			let currnet_note_jason_string = get_note_string(note.childNodes[3].value, note.childNodes[0].innerHTML, note.childNodes[1].innerHTML, checkbox_value);
+			
+			if (typeof(Storage) !== "undefined") {
+				localStorage.setItem(note_id, currnet_note_jason_string);
+			} else {
+				window.alert("Your browser does not support local storage and notes cannot be saved!");
+			}
 		}
 	}
-	
 	
 	function edit_title(header) {
 		
@@ -231,7 +376,7 @@
 		var done_button = note.childNodes[2];
 		done_button.style.visibility = "visible";
 		
-		var header_text = header.childNodes[0].nodeValue;
+		var header_text = header.innerHTML;
 		
 		var new_header = document.createElement("input");
 		
@@ -248,7 +393,7 @@
 		var done_button = note.childNodes[2];
 		done_button.style.visibility = "visible";		
 		
-		var textarea_text = textarea.childNodes[0].nodeValue;
+		var textarea_text = textarea.innerHTML;
 		var text_wrapper = document.createElement("textarea");
 		
 		text_wrapper.setAttribute("rows", "1");
@@ -266,16 +411,46 @@
 		note.replaceChild(text_wrapper, note.childNodes[1]);
 	}
 	
-	function add_item() {
+	function recreate_notes_from_localdb() {
+		
+		if (typeof(Storage) !== "undefined") {
 			
+			var stored_notes = localStorage.length;			
+			
+			for(let id = 1; id <= stored_notes; ++id) {				
+				var json_note = localStorage.getItem(id);
+				
+				if(json_note != "") {
+					var note = JSON.parse(json_note);							
+					add_item(note, id);
+				}			
+			}
+		} else {
+			window.alert("Your browser does not support local storage and notes cannot be saved!");
+		}		
+	}
+	
+	function add_item(note = null, id = null) {
+
+		if(note != null) {
+			var obj_color = note.color;
+			var obj_title = note.title;
+			var obj_note_text = note.text_area;
+			var obj_scratch = note.scratch;
+		}
+		
 		var new_note = document.createElement("div");
-		new_note.setAttribute("class", "note");			
+		new_note.setAttribute("class", "note");
+		//problem comes from here when i recreate the items i generate id as if i add more items not recreate old ones
+		var note_id = (note != null ? id : get_note_id());
+		new_note.setAttribute("id", note_id);
 		new_note.setAttribute("onmouseenter", "show_details(this)");		
 		new_note.setAttribute("onmouseleave", "hide_details(this)");			
 		
 		//input header
 		var new_header = document.createElement("div");		
-		var header_text = document.forms["add"]["note_header"].value;;
+		//var header_text = document.forms["add"]["note_header"].value;
+		var header_text = (note != null ? obj_title : document.forms["add"]["note_header"].value);
 		var herder_text_node = document.createTextNode(header_text);
 		
 		new_header.appendChild(herder_text_node);
@@ -286,7 +461,8 @@
 		new_note.appendChild(new_header);
 		
 		//input text
-		var note_text = document.forms["add"]["note_text"].value;
+		//var note_text = document.forms["add"]["note_text"].value;
+		var note_text = (note != null ? obj_note_text : document.forms["add"]["note_text"].value);
 		var text_wrapper = document.createElement("div");		
 		var textarea_node = document.createTextNode(note_text);
 		
@@ -301,13 +477,14 @@
 		new_done_button.appendChild(text_button_node);
 		new_done_button.setAttribute("class", "button button2 language");		
 		new_done_button.setAttribute("type", "button");
-		//new_done_button.setAttribute("style", "visibility: hidden;");
-		new_done_button.setAttribute("onclick", "done_edition(this);");
+		new_done_button.setAttribute("style", "visibility: hidden;");
+		new_done_button.setAttribute("onclick", "done_edition(this)");
 		new_note.appendChild(new_done_button);
 		
 		//color picker
 		var new_color_picker = document.createElement("input");
-		var creation_color = document.forms["add"]["pick_color"].value;
+		//var creation_color = document.forms["add"]["pick_color"].value;
+		var creation_color = (note != null ? obj_color : document.forms["add"]["pick_color"].value);
 		new_color_picker.setAttribute("type", "color");
 		new_color_picker.setAttribute("class", "picker");
 		new_color_picker.setAttribute("value", creation_color);
@@ -319,6 +496,10 @@
 		var new_show_status_node = document.createElement("input");
 		new_show_status_node.setAttribute("type", "checkbox");
 		new_show_status_node.setAttribute("class", "icon");
+		if(note != null && obj_scratch == 1) {
+			new_show_status_node.setAttribute("checked", "");
+			new_note.childNodes[1].setAttribute("style", "text-decoration: line-through");
+		}
 		//new_show_status_node.setAttribute("style", "visibility: hidden;");
 		new_show_status_node.setAttribute("onchange", "scratch_task(this)");
 		new_note.appendChild(new_show_status_node);
@@ -337,7 +518,21 @@
 		
 		var columns = document.getElementsByClassName("column");
 		var column_count = columns.length;
+						
+		//Note is fully created and tuned up
+		let checkbox_value = (new_show_status_node.checked ? 1 : 0);		
+		let currnet_note_jason_string = get_note_string(new_color_picker.getAttribute("value"), new_header.getAttribute("value"), text_wrapper.innerHTML, checkbox_value);
+
+		//Saving current note properties into local storage
+		if (typeof(Storage) !== "undefined") {
+			if(note == null) {
+				localStorage.setItem(note_id, currnet_note_jason_string);
+			}			
+		} else {
+			window.alert("Your browser does not support local storage and notes cannot be saved!");
+		}
 		
+		//Logic to place the note in a column
 		if(column_count == 0) {
 			
 			let margin = 5;
@@ -399,8 +594,8 @@
 	}
 	
 	function change_form_color(item_to_change_color = null) {
-	
-		var color = document.forms["add"]["pick_color"].value;
+		
+		var color = (item_to_change_color!=null ? item_to_change_color.childNodes[3].value : document.forms["add"]["pick_color"].value);
 		
 		if(item_to_change_color != null) {
 			item_to_change_color.setAttribute("style", "background-color: " + color + ";");
@@ -574,7 +769,7 @@
 		} else {
 
 			label_one.firstChild.nodeValue = "Change language";
-			label_two.firstChild.nodeValue = "Export/Import WebDB";
+			label_two.firstChild.nodeValue = "Export/Import LocalDB";
 			menu.setAttribute("style", "width: 160px;");
 			main.setAttribute("style", "margin-left: 190px;");
 			header.setAttribute("style" , "display: block;");			
@@ -583,7 +778,7 @@
 	}
 	
 	function initial_layout() {
-		
+				
 		phone_resolution();
 		
 		var element_size = 500;
@@ -617,4 +812,6 @@
 			}
 		}
 	}
+	recreate_notes_from_localdb();
 	initial_layout();
+	
