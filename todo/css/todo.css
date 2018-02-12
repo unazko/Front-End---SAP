@@ -1,0 +1,187 @@
+.note {
+	display: block;
+	margin: 5px;
+	width: 400px;
+	height: auto;
+	border-radius: 10px;
+	font-size: 25px;
+    padding: 10px;
+    box-shadow: 5px 5px 10px 5px #888888;
+}
+
+.note_header {				
+	margin: 5px;
+	font-weight: 700;
+	font-size: 30px;
+}
+
+.container {
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: column;
+	flex-direction: row;
+}
+
+.column {				
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: column;
+	flex-direction: column;
+}
+
+.animation {
+
+	position: absolute;
+	animation-name: item_move;
+	animation-timing-function: ease;
+	animation-duration: 1s;
+}
+
+.form {
+	margin: 40px;
+	margin-left: 35%;
+}
+
+
+@media only screen and (max-width: 650px) {
+    .column {
+        width: 100%;
+    }
+		
+	.note {
+		box-sizing: border-box;
+		width: 100%;
+		overflow: auto;
+		margin: 1px;		
+	}
+	
+	.form {
+		margin: 40px;
+		margin-left: 0px;
+		margin-top: 10px;
+	}
+}
+
+.header, .footer {		
+	background-color: gray;
+    text-align: center;
+	color: white;
+    padding: 20px;
+	margin: 0px;
+	font-size: 30px;
+	font-weight: 700;
+}
+
+.main {
+	margin-left: 190px;
+	padding: 0px 10px;
+}
+
+.footer {
+	position: fixed;
+}
+
+.menu a {
+	padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 25px;
+    color: black;	
+    display: block;
+}
+
+.menu {
+	height: auto;
+	width: 160px;
+	position: fixed;
+	z-index: 1;
+	overflow-x: hidden;
+	padding: 20px;
+	float: left;
+}
+
+html, body {
+  overflow-x: hidden;
+}
+
+
+.button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    cursor: pointer;
+	width: 160px;
+	padding: 1em;
+	font-size: 18px;
+}
+
+.button5 {
+    background-color: white;
+    color: black;
+    border: 2px solid #555555;
+}
+
+.button5:hover {
+    background-color: #555555;
+    color: white;
+}
+
+.button2 {
+    background-color: white; 
+    color: black; 
+    border: 2px solid #555555;
+	padding: 0.2em;
+}
+
+.button2:hover {
+    background-color: #555555;
+    color: white;
+}
+
+.input {
+	margin: 3px;
+    width: 100%;
+    padding: 5px;
+    display: inline-block;
+    border-radius: 5px;
+    box-sizing: border-box;	
+	font-size: 25px;
+	overflow: auto;
+}
+
+.picker {
+	position: relative;
+	width: 50px;
+	height: 50px;
+	margin: 5px;
+	left: 100px;
+	top: 10px;
+}
+
+.icon {
+	position: relative;
+	margin: 15px;
+	left: -65px;
+	cursor: pointer;
+}
+
+.textarea {
+   resize: none;
+}
+
+.link-button {
+	display: inline;
+	border: 1px solid gray;
+	cursor: pointer;
+}
+
+.language {
+	
+}
+
+

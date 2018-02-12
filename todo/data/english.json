@@ -1,0 +1,14 @@
+{
+	"title":"TODO",
+	"header":"TODO",
+	"label_one":"Change language",
+	"label_two":"Import/Export WebDB",
+	"input_title": "Title...",
+	"input_note_text": "Take a note...",
+	"done_button": "Done",
+	"title_not_filled": "Title must be filled out.",
+	"text_not_filled": "Note text must be filled out.",
+	"title_too_long": "Header is to long.",
+	"color_too_dark": "The color you have choosen for the note is too dark. Dark colors are not suported. Be more optimistic :)",
+	"in_construction": "In construction."
+}
