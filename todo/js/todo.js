@@ -1,8 +1,6 @@
 	/**
 	*	TODO:
 	*	1)	 Drag and drop functionality for the notes
-	*	2)	 Use browser localdb to store all information about the notes and language (authorization not required)
-	*	3)	 Export localdb to file so it can be imported in other browsers
 	**/
 	"use strict";	
 	
@@ -173,7 +171,7 @@
 		else if(note_text == "") {
 			window.alert(error_messages[1]);
 		}
-		else if(header_text.length > 20) {
+		else if(header_text.length > 40) {
 			window.alert(error_messages[2]);
 		} else if(luma < 40) {
 			window.alert(error_messages[3]);
